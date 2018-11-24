@@ -35,15 +35,16 @@ configp = Config . fromMaybe "config.yaml"
 parse :: [String] -> IO Flags
 parse argv =
   case getOpt Permute options argv of
-    (flags, _, []) -> do
+    (flags, _, []) ->
       if Help `elem` flags
         then do
           hPutStrLn stderr (usageInfo header options)
-          exitWith ExitSuccess
-        else do
+          exitSuccess
+        else
           return $ nub flags
     (_, _, errs) -> do
       hPutStrLn stderr (concat errs ++ usageInfo header options)
       exitWith $ ExitFailure 1
   where
     header = "Usage: mailgun-cli [OPTION ...]"
+
