@@ -12,12 +12,22 @@ import System.Exit
 import System.Environment
 import System.IO
 import Text.Printf
+import Control.Monad (when)
+
+version :: String
+version = "Version: 0.1.0.0"
+
+usage :: String
+usage = usageInfo header options
+  where
+    header = "Usage: mailgun-cli [OPTION ...]"
 
 data Flag
   = Domain String
   | ApiKey String
   | Config String
   | Help
+  | Version
   deriving (Eq, Ord, Show)
 
 type Flags = [Flag]
@@ -27,6 +37,7 @@ options =
   , Option []    ["api-key"] (ReqArg ApiKey "API-KEY")      "Mailgun API-KEY"
   , Option ['c'] ["config"]  (OptArg configp "config.yaml") "yaml config file"
   , Option ['h'] ["help"]    (NoArg Help)                   "Print this help message."
+  , Option []    ["version"] (NoArg Version)                "Print version."
   ]
 
 configp :: Maybe String -> Flag
@@ -38,13 +49,13 @@ parse argv =
     (flags, _, []) ->
       if Help `elem` flags
         then do
-          hPutStrLn stderr (usageInfo header options)
+          when (Version `elem` flags) $ putStrLn version
+          hPutStrLn stderr usage
           exitSuccess
-        else
+        else do
+          when (Version `elem` flags) $ do { putStrLn version; exitSuccess; }
           return $ nub flags
     (_, _, errs) -> do
-      hPutStrLn stderr (concat errs ++ usageInfo header options)
+      hPutStrLn stderr (concat errs ++ usage)
       exitWith $ ExitFailure 1
-  where
-    header = "Usage: mailgun-cli [OPTION ...]"
 
