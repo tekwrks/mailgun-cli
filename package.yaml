@@ -22,6 +22,8 @@ dependencies:
   - hailgun
   - yaml
   - aeson
+  - microstache
+  - text
 
 library:
   source-dirs: src
