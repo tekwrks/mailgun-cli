@@ -2,20 +2,17 @@ module Flags
   ( Flag (..)
   , Flags
   , parse
+  , usage
   ) where
 
 import Data.Char
 import Data.List
 import Data.Maybe
 import System.Console.GetOpt
-import System.Exit
 import System.Environment
+import System.Exit
 import System.IO
 import Text.Printf
-import Control.Monad (when)
-
-version :: String
-version = "Version: 0.1.0.0"
 
 usage :: String
 usage = usageInfo header options
@@ -43,18 +40,11 @@ options =
 configp :: Maybe String -> Flag
 configp = Config . fromMaybe "config.yaml"
 
-parse :: [String] -> IO Flags
+parse :: [String] -> IO (Flags, [String])
 parse argv =
   case getOpt Permute options argv of
-    (flags, _, []) ->
-      if Help `elem` flags
-        then do
-          when (Version `elem` flags) $ putStrLn version
-          hPutStrLn stderr usage
-          exitSuccess
-        else do
-          when (Version `elem` flags) $ do { putStrLn version; exitSuccess; }
-          return $ nub flags
+    (flags, args, []) ->
+      return (nub flags, nub args)
     (_, _, errs) -> do
       hPutStrLn stderr (concat errs ++ usage)
       exitWith $ ExitFailure 1
