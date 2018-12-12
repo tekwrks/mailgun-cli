@@ -1,10 +1,11 @@
-module FlagsSpec where
+module FlagsSpec (spec) where
 
 import Test.Hspec
 
 import qualified Flags
 
-tests = do
+spec :: Spec
+spec = do
   it "parses empty params as no flags" $ do
     (fs, as) <- Flags.parse [""]
     fs `shouldBe` []
