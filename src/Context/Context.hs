@@ -1,4 +1,4 @@
-module Context
+module Context.Context
   ( create
   ) where
 
@@ -14,10 +14,7 @@ import Data.Yaml (ParseException)
 import Flags (Flag(..), Flags)
 import qualified Config (decodeContext)
 
-data Context = Context
-  { domain :: Maybe String
-  , apiKey :: Maybe String
-  } deriving (Eq, Show)
+import Context.Types (Context(..))
 
 findDomain :: Flags -> Maybe String
 findDomain [] = Nothing
@@ -39,7 +36,7 @@ fromFile :: Flags -> IO Context
 fromFile [] = return $ Context Nothing Nothing
 fromFile (Config config :fs) = do
   econtext <- Config.decodeContext config
-  either fileError (fileParsed . flexible) econtext
+  either fileError (fileParsed) econtext
   where
     fileError e = do
       hPutStrLn stderr $ "Error: " ++ show e
@@ -53,24 +50,19 @@ override base over =
     (domain over <|> domain base)
     (apiKey over <|> apiKey base)
 
-flexible :: HailgunContext -> Context
-flexible c = Context
-  (Just $ hailgunDomain c)
-  (Just $ hailgunApiKey c)
-
-concrete :: Context -> IO HailgunContext
+concrete :: Context -> IO (Either String HailgunContext)
 concrete Context{ domain=Just d, apiKey=Just k } =
-  return $ HailgunContext d k Nothing
-concrete _ = notEnoughContext
+  return $ Right $ HailgunContext d k Nothing
+concrete _ = return notEnoughContext
 
-create :: Flags -> IO HailgunContext
-create [] = notEnoughContext
+create :: Flags -> IO (Either String HailgunContext)
+create [] = return notEnoughContext
 create fs = do
   let cArgs = fromArgs fs
   cFile <- fromFile fs
   concrete $ override cFile cArgs
 
-notEnoughContext = do
-  hPutStrLn stderr "Error: Provide Domain and ApiKey"
-  exitWith $ ExitFailure 1
+notEnoughContext :: Either String HailgunContext
+notEnoughContext = Left $
+  "Error: Domain and ApiKey are required, but found none"
 
