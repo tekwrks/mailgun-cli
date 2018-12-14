@@ -12,19 +12,20 @@ import qualified Environment (get)
 import Control.Monad.Trans.Reader
 import Control.Monad.IO.Class
 
-import qualified Flags (usage, Flag(Help, Version))
+import qualified Flags (Flag(Help, Version))
 import Flags (usage)
-import qualified Context.Context as Context (create)
 import qualified Variables.Variables as Variables (get)
-import qualified Template (get, variables)
+-- import qualified Context.Context as Context (create)
+-- import qualified Template (get, variables)
 
 main :: IO ()
 main = do
   env <- Environment.get
   print env
   runReaderT handleSpecial env
-  -- variables <- Variables.get flags
-  -- print variables
+  variables <- runReaderT Variables.get env
+  print variables
+
   -- context <- Context.create flags
   -- print context
   -- template <- Template.get "template.mustache"
