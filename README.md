@@ -1,5 +1,7 @@
 # mailgun-cli
 
+[![Build Status](https://travis-ci.org/tekwrks/mailgun-cli.svg?branch=master)](https://travis-ci.org/tekwrks/mailgun-cli)
+
 Command line tool to easily send emails through Mailgun
 
 accepts mustache variables from:
