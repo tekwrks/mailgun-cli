@@ -1,18 +1,44 @@
 module Main where
 
-import System.Environment (getArgs)
+import Paths_mailgun_cli (version)
+import Data.Version (showVersion)
 
-import qualified Flags (parse)
-import qualified Context (create)
+import System.Exit
+import Control.Monad (when)
+
+import Environment (Environment(..))
+import qualified Environment (get)
+
+import Control.Monad.Trans.Reader
+import Control.Monad.IO.Class
+
+import qualified Flags (usage, Flag(Help, Version))
+import Flags (usage)
+import qualified Context.Context as Context (create)
+import qualified Variables.Variables as Variables (get)
 import qualified Template (get, variables)
 
 main :: IO ()
 main = do
-  flags <- Flags.parse =<< getArgs
-  print flags
-  context <- Context.create flags
-  print context
-  template <- Template.get "template.mustache"
-  print template
-  print $ Template.variables template
+  env <- Environment.get
+  print env
+  runReaderT handleSpecial env
+  -- variables <- Variables.get flags
+  -- print variables
+  -- context <- Context.create flags
+  -- print context
+  -- template <- Template.get "template.mustache"
+  -- print template
+  -- print $ Template.variables template
+
+handleSpecial :: ReaderT Environment IO ()
+handleSpecial = do
+  fs <- flags <$> ask
+  when (Flags.Help `elem` fs) $ liftIO $ do
+    putStrLn usage
+    exitSuccess
+  when (Flags.Version `elem` fs) $ liftIO $ do
+    putStrLn $ showVersion version
+    exitSuccess
+  return ()
 

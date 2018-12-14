@@ -5,7 +5,7 @@ import Test.Hspec
 import qualified Flags
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   it "parses empty params as no flags" $ do
     (fs, as) <- Flags.parse [""]
     fs `shouldBe` []

@@ -24,6 +24,8 @@ dependencies:
   - aeson
   - microstache
   - text
+  - unordered-containers
+  - transformers
 
 library:
   source-dirs: src
@@ -36,14 +38,14 @@ executables:
       - -threaded
       - -rtsopts
       - -with-rtsopts=-N
+      - -fwarn-unused-imports
     dependencies:
       - mailgun-cli
 
 tests:
   mailgun-cli-test:
     main:                Spec.hs
-    source-dirs:         
-      - test
+    source-dirs:         test
     ghc-options:
       - -threaded
       - -rtsopts

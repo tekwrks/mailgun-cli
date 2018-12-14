@@ -25,7 +25,7 @@ data Flag
   | Config String
   | Help
   | Version
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Show)
 
 type Flags = [Flag]
 
