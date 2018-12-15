@@ -1,6 +1,3 @@
 .stack-work/
 mailgun-cli.cabal
 .hspec-failures
-
-config.yaml
-template.mustache

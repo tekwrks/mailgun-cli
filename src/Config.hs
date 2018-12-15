@@ -17,10 +17,16 @@ import Data.Aeson.Types (typeMismatch)
 import Context.Types (Context(..))
 import Variables.Types (Variable, Variables)
 
+data Template = Template
+  { engine :: String
+  , path :: Maybe FilePath
+  }
+
 data Config = Config
   { domain :: Maybe String
   , apiKey :: Maybe String
   , variables :: Maybe Object
+  , template :: Template
   }
 
 instance FromJSON Config where
@@ -28,6 +34,11 @@ instance FromJSON Config where
     <$> v .:? "domain"
     <*> v .:? "apiKey"
     <*> v .:? "variables"
+    <*> (v .: "template" >>= parseTemplate)
+      where
+        parseTemplate (Object t) = Template
+          <$> t .:? "engine" .!= "mustache"
+          <*> t .: "path"
   parseJSON invalid = typeMismatch "Config" invalid
 
 configToContext :: Config -> Context

@@ -1,0 +1,11 @@
+domain: DOMAIN
+apiKey: API-KEY
+
+template:
+  engine: mustache
+  path: ./template.mustache
+
+variables:
+  greeting: Hello
+  name: World
+

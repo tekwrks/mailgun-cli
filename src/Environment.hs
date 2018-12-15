@@ -14,8 +14,6 @@ data Environment = Environment
 get :: IO (Environment)
 get = do
   (flags, args) <- parse =<< getArgs
-  print flags
-  print args
   let env = Environment flags args
   return env
 
