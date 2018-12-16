@@ -10,8 +10,6 @@ import Data.List (nubBy, filter)
 import System.IO
 import System.Exit
 import Data.Yaml (ParseException)
-import Control.Monad.Trans.Reader
-import Control.Monad.IO.Class
 import qualified Data.Text as T
 
 import Environment (Environment(..))
@@ -38,12 +36,12 @@ fromArgs (a:as) = do
   let (k,v) = T.breakOn "=" (T.pack a)
   return $ (T.unpack k, T.unpack . T.tail $ v) : rest
 
-get :: ReaderT Environment IO Variables
-get = do
-  fs <- flags <$> ask
-  as <- args <$> ask
-  vFile <- liftIO $ fromFile fs
-  vArgs <- liftIO $ fromArgs as
+get :: Environment -> IO Variables
+get env = do
+  let fs = flags env
+  let as = args env
+  vFile <- fromFile fs
+  vArgs <- fromArgs as
   return . mergeFilter $ vArgs ++ vFile
   where
     mergeFilter =

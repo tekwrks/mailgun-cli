@@ -9,36 +9,33 @@ import Control.Monad (when)
 import Environment (Environment(..))
 import qualified Environment (get)
 
-import Control.Monad.Trans.Reader
-import Control.Monad.IO.Class
-
 import qualified Flags (Flag(Help, Version))
 import Flags (usage)
 import qualified Variables.Variables as Variables (get)
--- import qualified Context.Context as Context (create)
--- import qualified Template (get, variables)
+import qualified Context.Context as Context (create)
 
 main :: IO ()
 main = do
   env <- Environment.get
   print env
-  runReaderT handleSpecial env
-  variables <- runReaderT Variables.get env
+  handleSpecial env
+  variables <- Variables.get env
   print variables
+  econtext <- Context.create env
+  case econtext of
+    Left err -> do
+      print err
+      exitWith $ ExitFailure 1
+    Right context -> do
+      print context
 
-  -- context <- Context.create flags
-  -- print context
-  -- template <- Template.get "template.mustache"
-  -- print template
-  -- print $ Template.variables template
-
-handleSpecial :: ReaderT Environment IO ()
-handleSpecial = do
-  fs <- flags <$> ask
-  when (Flags.Help `elem` fs) $ liftIO $ do
+handleSpecial :: Environment -> IO ()
+handleSpecial env = do
+  let fs = flags env
+  when (Flags.Help `elem` fs) $ do
     putStrLn usage
     exitSuccess
-  when (Flags.Version `elem` fs) $ liftIO $ do
+  when (Flags.Version `elem` fs) $ do
     putStrLn $ showVersion version
     exitSuccess
   return ()

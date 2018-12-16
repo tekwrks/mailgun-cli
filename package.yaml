@@ -25,7 +25,6 @@ dependencies:
   - microstache
   - text
   - unordered-containers
-  - transformers
 
 library:
   source-dirs: src

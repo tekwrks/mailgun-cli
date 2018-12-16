@@ -11,6 +11,7 @@ import System.Exit
 import Mail.Hailgun (HailgunContext(..))
 import Data.Yaml (ParseException)
 
+import Environment (Environment(..))
 import Flags (Flag(..), Flags)
 import qualified Config (decodeContext)
 
@@ -37,11 +38,11 @@ fromFile [] = return $ Context Nothing Nothing
 fromFile (Config config :fs) = do
   econtext <- Config.decodeContext config
   either fileError (fileParsed) econtext
-  where
-    fileError e = do
-      hPutStrLn stderr $ "Error: " ++ show e
-      exitWith $ ExitFailure 1
-    fileParsed c = return $ Context (domain c) (apiKey c)
+    where
+      fileError e = do
+        hPutStrLn stderr $ "Error: " ++ show e
+        exitWith $ ExitFailure 1
+      fileParsed c = return $ Context (domain c) (apiKey c)
 fromFile (f:fs) = fromFile fs
 
 override :: Context -> Context -> Context
@@ -55,12 +56,14 @@ concrete Context{ domain=Just d, apiKey=Just k } =
   return $ Right $ HailgunContext d k Nothing
 concrete _ = return notEnoughContext
 
-create :: Flags -> IO (Either String HailgunContext)
-create [] = return notEnoughContext
-create fs = do
-  let cArgs = fromArgs fs
-  cFile <- fromFile fs
-  concrete $ override cFile cArgs
+create :: Environment -> IO (Either String HailgunContext)
+create env =
+  case flags env of
+    [] -> return notEnoughContext
+    fs -> do
+        let cArgs = fromArgs fs
+        cFile <- fromFile fs
+        concrete $ override cFile cArgs
 
 notEnoughContext :: Either String HailgunContext
 notEnoughContext = Left $
