@@ -8,11 +8,11 @@ import Control.Monad (when)
 
 import Environment (Environment(..))
 import qualified Environment (get)
-
 import qualified Flags (Flag(Help, Version))
 import Flags (usage)
 import qualified Variables.Variables as Variables (get)
 import qualified Context.Context as Context (create)
+import qualified Builder (getTemplate)
 
 main :: IO ()
 main = do
@@ -28,6 +28,8 @@ main = do
       exitWith $ ExitFailure 1
     Right context -> do
       print context
+  template <- Builder.getTemplate env
+  print template
 
 handleSpecial :: Environment -> IO ()
 handleSpecial env = do

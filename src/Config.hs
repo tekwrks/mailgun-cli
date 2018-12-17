@@ -4,6 +4,8 @@ module Config
   , getVariables
   , Variable
   , Variables
+  , getTemplate
+  , Template(..)
   ) where
 
 import System.IO
@@ -16,11 +18,7 @@ import Data.Aeson.Types (typeMismatch)
 
 import Context.Types (Context(..))
 import Variables.Types (Variable, Variables)
-
-data Template = Template
-  { engine :: String
-  , path :: Maybe FilePath
-  }
+import Template (Template(..))
 
 data Config = Config
   { domain :: Maybe String
@@ -67,4 +65,9 @@ getVariables fp = do
   where
     invalid = Left
     valid = Right . parseVariables . variables
+
+getTemplate :: FilePath -> IO (Either ParseException Template)
+getTemplate fp = do
+  parsed <- decodeFileEither fp
+  return $ template <$> parsed
 

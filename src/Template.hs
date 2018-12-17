@@ -1,4 +1,8 @@
-module Template where
+module Template
+  ( Template(..)
+  , get
+  , variables
+  ) where
 
 import Control.Exception
 import qualified Data.Text as T
@@ -8,6 +12,11 @@ import System.Exit
 import System.IO
 import Text.Microstache.Parser (parseMustache)
 import Text.Microstache.Type (Node(..), Key(..))
+
+data Template = Template
+  { engine :: String
+  , path :: Maybe FilePath
+  }
 
 get :: FilePath -> IO [Node]
 get fp = do
@@ -27,9 +36,9 @@ variables :: [Node] -> [T.Text]
 variables = nub . concatMap getKey . filter isVar
   where
    isVar (EscapedVar _) = True
-   -- isVar (UnescapedVar _) = True
+   isVar (UnescapedVar _) = True
    isVar n = False
    getKey (EscapedVar k) = unKey k
-   -- getKey (UnescapedVar k) = unKey k
+   getKey (UnescapedVar k) = unKey k
    getKey _ = [T.pack ""]
 
