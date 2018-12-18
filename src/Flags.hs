@@ -5,14 +5,11 @@ module Flags
   , usage
   ) where
 
-import Data.Char
 import Data.List
 import Data.Maybe
 import System.Console.GetOpt
-import System.Environment
 import System.Exit
 import System.IO
-import Text.Printf
 
 usage :: String
 usage = usageInfo header options
