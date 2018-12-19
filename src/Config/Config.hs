@@ -11,7 +11,6 @@ import Mail.Hailgun
 import Data.Yaml
 import Data.Aeson.Types (typeMismatch)
 
-import Context.Types (Context(..))
 import Variables.Types (Variable, Variables)
 import Template (TemplateDesc(..))
 

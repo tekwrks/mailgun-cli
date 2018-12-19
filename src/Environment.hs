@@ -10,7 +10,7 @@ import System.Exit
 import Control.Monad (when)
 import System.Environment (getArgs)
 import Mail.Hailgun (HailgunContext(..))
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, maybe)
 import Data.List (nub)
 
 import Flags (Flags, parse, usage)
@@ -19,6 +19,7 @@ import Variables.Types (Variables)
 import qualified Variables.Variables as Variables (get)
 import Config.Types (Config)
 import qualified Config.Config as Config (get, Config(..))
+import qualified Context (create)
 
 data Environment = Environment
   { flags :: Flags
@@ -31,14 +32,14 @@ get = do
   (flags, args, mconfig) <- getFlags
   handleSpecials flags
   variables <- Variables.get args mconfig
-  let context = HailgunContext "a" "b" Nothing
+  context <- Context.create flags mconfig
   return $ Environment flags variables context
 
 getFlags :: IO (Flags, [String], Maybe Config)
 getFlags = do
   (flags', args') <- parse =<< getArgs
   mConfig <- configFromFlags flags'
-  let mflags'' = fromMaybe Nothing $ Config.flags <$> mConfig
+  let mflags'' = maybe Nothing Config.flags mConfig
   (flags'', args'') <- parse $ fromMaybe [] mflags''
   return (nub $ flags' ++ flags'', nub $ args' ++ args'', mConfig)
 
