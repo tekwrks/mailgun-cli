@@ -11,11 +11,10 @@ import Control.Exception
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Data.List (nub)
-import System.Exit
-import System.IO
 import Text.Microstache.Parser (parseMustache)
 import Text.Microstache.Type (Node(..), Key(..))
 
+import qualified Errors (parseMustache, ioError)
 import Variables.Types (Variable, Variables, find)
 
 data TemplateDesc = TemplateDesc
@@ -27,17 +26,10 @@ type Template = [Node]
 
 get :: TemplateDesc -> IO Template
 get TemplateDesc{ engine=_, path=p } = do
-  c <- catch (readFile p) errHandler
+  c <- catch (readFile p) Errors.ioError
   case parseMustache p (TL.pack c) of
-    Left e2 -> do
-      hPrint stderr e2
-      exitWith $ ExitFailure 1
+    Left e -> Errors.parseMustache e
     Right ns -> return ns
-  where
-    errHandler :: IOError -> IO String
-    errHandler e = do
-      hPrint stderr e
-      exitWith $ ExitFailure 1
 
 variables :: Template -> [String]
 variables = nub . concatMap getKey . filter isVar

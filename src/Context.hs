@@ -3,11 +3,9 @@ module Context
   ) where
 
 import Control.Applicative ((<|>))
-import System.IO
-import System.Exit
-
 import Mail.Hailgun (HailgunContext(..))
 
+import qualified Errors (notEnoughContext)
 import qualified Config.Types as Config (Config(..))
 import Flags (Flag(..), Flags)
 
@@ -46,16 +44,11 @@ override base over = Context
 construct :: Context -> IO HailgunContext
 construct Context{ domain=Just d, apiKey=Just k } =
   return $ HailgunContext d k Nothing
-construct _ = notEnoughContext
+construct _ = Errors.notEnoughContext
 
 create :: Flags -> Maybe Config.Config -> IO HailgunContext
 create fs mc = do
   let cArgs = fromArgs fs
   let cFile = fromConfig mc
   construct $ override cFile cArgs
-
-notEnoughContext :: IO HailgunContext
-notEnoughContext = do
-  print "Error: Domain and ApiKey are required, but found none"
-  exitWith $ ExitFailure 2
 

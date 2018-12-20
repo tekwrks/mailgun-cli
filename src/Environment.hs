@@ -6,7 +6,7 @@ module Environment
 import Paths_mailgun_cli (version)
 import Data.Version (showVersion)
 
-import System.Exit
+import System.Exit (exitSuccess)
 import Control.Monad (when)
 import System.Environment (getArgs)
 import Mail.Hailgun (HailgunContext(..))
@@ -14,6 +14,7 @@ import Data.Maybe (fromMaybe, maybe)
 import Data.List (nub)
 import Control.Applicative ((<|>))
 
+import qualified Errors (noTemplate, parseFailed)
 import Flags (Flags, parse, usage)
 import qualified Flags (Flag(Help, Version, Config, Mustache))
 import Variables.Types (Variables)
@@ -37,13 +38,8 @@ get = do
   handleSpecials flags
   variables <- Variables.get args mconfig
   context <- Context.create flags mconfig
-  template <- maybe noTemplate Template.get $ getTemplate flags mconfig
+  template <- maybe Errors.noTemplate Template.get $ getTemplate flags mconfig
   return $ Environment flags variables context template
-
-noTemplate :: IO Template
-noTemplate = do
-  putStrLn "no template found : failed"
-  exitWith $ ExitFailure 3
 
 getTemplate :: Flags -> Maybe Config.Config -> Maybe TemplateDesc
 getTemplate fs Nothing = templateFromFlags fs
@@ -63,13 +59,10 @@ getFlags = do
   return (nub $ flags' ++ flags'', nub $ args' ++ args'', mConfig)
 
 configFromFlags :: Flags -> IO (Maybe Config)
+configFromFlags [] = return Nothing
 configFromFlags (Flags.Config c :fs) = do
   eConfig <- Config.get c
-  either parseError (return . Just) eConfig
-    where
-      parseError e = do
-        print e
-        exitWith $ ExitFailure 2
+  either Errors.parseFailed (return . Just) eConfig
 configFromFlags (f:fs) = configFromFlags fs
 
 handleSpecials :: Flags -> IO ()

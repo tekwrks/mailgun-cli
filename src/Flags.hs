@@ -8,8 +8,8 @@ module Flags
 import Data.List
 import Data.Maybe
 import System.Console.GetOpt
-import System.Exit
-import System.IO
+
+import qualified Errors (getFlagsFailed)
 
 usage :: String
 usage = usageInfo header options
@@ -44,9 +44,6 @@ configp = Config . fromMaybe "config.yaml"
 parse :: [String] -> IO (Flags, [String])
 parse argv =
   case getOpt Permute options argv of
-    (flags, args, []) ->
-      return (nub flags, nub args)
-    (_, _, errs) -> do
-      hPutStrLn stderr (concat errs ++ usage)
-      exitWith $ ExitFailure 1
+    (flags, args, []) -> return (nub flags, nub args)
+    (_, _, errs) -> Errors.getFlagsFailed (concat errs) usage
 
