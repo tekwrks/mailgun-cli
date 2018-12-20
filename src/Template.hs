@@ -3,6 +3,7 @@ module Template
   , get
   , Template
   , variables
+  , substitute
   ) where
 
 import Control.Exception
@@ -13,6 +14,8 @@ import System.Exit
 import System.IO
 import Text.Microstache.Parser (parseMustache)
 import Text.Microstache.Type (Node(..), Key(..))
+
+import Variables.Types (Variable, Variables, find)
 
 data TemplateDesc = TemplateDesc
   { engine :: String
@@ -35,13 +38,26 @@ get TemplateDesc{ engine=_, path=p } = do
       hPrint stderr e
       exitWith $ ExitFailure 1
 
-variables :: Template -> [T.Text]
+variables :: Template -> [String]
 variables = nub . concatMap getKey . filter isVar
   where
    isVar (EscapedVar _) = True
    isVar (UnescapedVar _) = True
    isVar n = False
-   getKey (EscapedVar k) = unKey k
-   getKey (UnescapedVar k) = unKey k
-   getKey _ = [T.pack ""]
+   getKey (EscapedVar k) = T.unpack <$> unKey k
+   getKey (UnescapedVar k) = T.unpack <$> unKey k
+   getKey _ = [""]
+
+substitute :: Template -> Variables -> Template
+substitute [] _ = []
+substitute (EscapedVar v :ts) vs = substituted : substitute ts vs
+  where
+    substituted = maybe (EscapedVar v) TextBlock $ find vs (keyToString v)
+substitute (UnescapedVar v :ts) vs = substituted : substitute ts vs
+  where
+    substituted = maybe (UnescapedVar v) TextBlock $ find vs (keyToString v)
+substitute (t:ts) vs = t : substitute ts vs
+
+keyToString :: Key -> String
+keyToString = T.unpack . head . unKey
 

@@ -1,11 +1,15 @@
 module Main where
 
-import qualified Environment (get)
+import Environment (get, Environment(..))
+import qualified Template (substitute, variables)
 
 main :: IO ()
 main = do
-  env <- Environment.get
-  print env
+  env <- get
+  -- print env
+  let substituted = Template.substitute (template env) (variables env)
+  print substituted
+  print $ Template.variables substituted
   -- econtext <- Context.create env
   -- case econtext of
   --   Left err -> do
