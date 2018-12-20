@@ -4,6 +4,7 @@ module Template
   , Template
   , variables
   , substitute
+  , render
   ) where
 
 import Control.Exception
@@ -60,4 +61,9 @@ substitute (t:ts) vs = t : substitute ts vs
 
 keyToString :: Key -> String
 keyToString = T.unpack . head . unKey
+
+render :: Template -> Maybe String
+render [] = Just ""
+render (TextBlock t :ts) = (Just . T.unpack $ t) <> render ts
+render _ = Nothing
 

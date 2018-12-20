@@ -21,7 +21,6 @@ data Flag
   | ApiKey String
   | Config String
   | Mustache FilePath
-  | NonInteractive
   | DryRun
   | Help
   | Version
@@ -34,7 +33,6 @@ options =
   , Option []    ["api-key"]        (ReqArg ApiKey "API-KEY")      "Mailgun API-KEY"
   , Option ['c'] ["config"]         (OptArg configp "config.yaml") "yaml config file"
   , Option ['m'] ["mustache"]       (ReqArg Mustache ".mustache")  "mustache template"
-  , Option ['n'] ["no-interaction"] (NoArg NonInteractive)         "non-interactive mode - fail instead of asking for user input/confirmation"
   , Option ['d'] ["dry-run"]        (NoArg DryRun)                 "dry-run, print actions, but don't execute anything"
   , Option ['h'] ["help"]           (NoArg Help)                   "Print this help message."
   , Option []    ["version"]        (NoArg Version)                "Print version."

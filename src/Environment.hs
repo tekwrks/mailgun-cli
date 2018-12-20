@@ -15,7 +15,7 @@ import Data.List (nub)
 import Control.Applicative ((<|>))
 
 import Flags (Flags, parse, usage)
-import qualified Flags (Flag(Help, Version, Config, Mustache, NonInteractive))
+import qualified Flags (Flag(Help, Version, Config, Mustache))
 import Variables.Types (Variables)
 import qualified Variables.Variables as Variables (get)
 import Config.Types (Config)
@@ -37,23 +37,13 @@ get = do
   handleSpecials flags
   variables <- Variables.get args mconfig
   context <- Context.create flags mconfig
-  template <- maybe (askTemplate flags) Template.get $ getTemplate flags mconfig
+  template <- maybe noTemplate Template.get $ getTemplate flags mconfig
   return $ Environment flags variables context template
 
-askTemplate :: Flags -> IO Template
-askTemplate fs =
-  if Flags.NonInteractive `elem` fs
-     then tryAskTemplate
-     else do
-       putStrLn "no template found : failed"
-       exitWith $ ExitFailure 3
-    where
-      tryAskTemplate :: IO Template
-      tryAskTemplate = do
-        putStrLn "Template file path: "
-        path <- getLine
-        let desc = TemplateDesc "mustache" path
-        Template.get desc
+noTemplate :: IO Template
+noTemplate = do
+  putStrLn "no template found : failed"
+  exitWith $ ExitFailure 3
 
 getTemplate :: Flags -> Maybe Config.Config -> Maybe TemplateDesc
 getTemplate fs Nothing = templateFromFlags fs
