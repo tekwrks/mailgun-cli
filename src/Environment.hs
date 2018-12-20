@@ -12,19 +12,23 @@ import System.Environment (getArgs)
 import Mail.Hailgun (HailgunContext(..))
 import Data.Maybe (fromMaybe, maybe)
 import Data.List (nub)
+import Control.Applicative ((<|>))
 
 import Flags (Flags, parse, usage)
-import qualified Flags (Flag(Help, Version, Config))
+import qualified Flags (Flag(Help, Version, Config, Mustache, NonInteractive))
 import Variables.Types (Variables)
 import qualified Variables.Variables as Variables (get)
 import Config.Types (Config)
 import qualified Config.Config as Config (get, Config(..))
 import qualified Context (create)
+import Template (TemplateDesc(..), Template)
+import qualified Template (get)
 
 data Environment = Environment
   { flags :: Flags
   , variables :: Variables
   , context :: HailgunContext
+  , template :: Template
   } deriving (Show)
 
 get :: IO Environment
@@ -33,7 +37,32 @@ get = do
   handleSpecials flags
   variables <- Variables.get args mconfig
   context <- Context.create flags mconfig
-  return $ Environment flags variables context
+  template <- maybe (askTemplate flags) Template.get $ getTemplate flags mconfig
+  return $ Environment flags variables context template
+
+askTemplate :: Flags -> IO Template
+askTemplate fs =
+  if Flags.NonInteractive `elem` fs
+     then tryAskTemplate
+     else do
+       putStrLn "no template found : failed"
+       exitWith $ ExitFailure 3
+    where
+      tryAskTemplate :: IO Template
+      tryAskTemplate = do
+        putStrLn "Template file path: "
+        path <- getLine
+        let desc = TemplateDesc "mustache" path
+        Template.get desc
+
+getTemplate :: Flags -> Maybe Config.Config -> Maybe TemplateDesc
+getTemplate fs Nothing = templateFromFlags fs
+getTemplate fs (Just c) = templateFromFlags fs <|> Config.template c
+
+templateFromFlags :: Flags -> Maybe TemplateDesc
+templateFromFlags [] = Nothing
+templateFromFlags (Flags.Mustache p :fs) = Just $ TemplateDesc "mustache" p
+templateFromFlags (f:fs) = templateFromFlags fs
 
 getFlags :: IO (Flags, [String], Maybe Config)
 getFlags = do

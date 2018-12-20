@@ -24,9 +24,6 @@ instance FromJSON Config where
     <*> (v .: "template" >>= parseTemplate)
     <*> v .:? "flags"
       where
-        parseTemplate (Object t) = TemplateDesc
-          <$> t .:? "engine" .!= "mustache"
-          <*> t .: "path"
         parseVariables :: Maybe Object -> Parser Variables
         parseVariables Nothing = return []
         parseVariables (Just o) = return $ fmap parseVariable $ toList o
@@ -36,6 +33,12 @@ instance FromJSON Config where
             extract (Number s) = show s
             extract Null = ""
             extract _ = ""
+        parseTemplate :: Maybe Object -> Parser (Maybe TemplateDesc)
+        parseTemplate (Just t) = TemplateDesc
+          <$> t .:? "engine" .!= "mustache"
+          <*> t .: "path"
+          >>= (return . Just)
+        parseTemplate Nothing = return Nothing
   parseJSON invalid = typeMismatch "Config" invalid
 
 get :: FilePath -> IO (Either ParseException Config)

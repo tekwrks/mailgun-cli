@@ -7,7 +7,7 @@ data Config = Config
   { domain :: Maybe String
   , apiKey :: Maybe String
   , variables :: Variables
-  , template :: TemplateDesc
+  , template :: Maybe TemplateDesc
   , flags :: Maybe [String]
   }
 

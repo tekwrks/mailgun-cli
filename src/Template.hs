@@ -1,6 +1,7 @@
 module Template
-  ( Template(..)
+  ( TemplateDesc(..)
   , get
+  , Template
   , variables
   ) where
 
@@ -13,15 +14,17 @@ import System.IO
 import Text.Microstache.Parser (parseMustache)
 import Text.Microstache.Type (Node(..), Key(..))
 
-data Template = Template
+data TemplateDesc = TemplateDesc
   { engine :: String
-  , path :: Maybe FilePath
+  , path :: FilePath
   }
 
-get :: FilePath -> IO [Node]
-get fp = do
-  c <- catch (readFile fp) errHandler
-  case parseMustache fp (TL.pack c) of
+type Template = [Node]
+
+get :: TemplateDesc -> IO Template
+get TemplateDesc{ engine=_, path=p } = do
+  c <- catch (readFile p) errHandler
+  case parseMustache p (TL.pack c) of
     Left e2 -> do
       hPrint stderr e2
       exitWith $ ExitFailure 1
@@ -32,7 +35,7 @@ get fp = do
       hPrint stderr e
       exitWith $ ExitFailure 1
 
-variables :: [Node] -> [T.Text]
+variables :: Template -> [T.Text]
 variables = nub . concatMap getKey . filter isVar
   where
    isVar (EscapedVar _) = True
