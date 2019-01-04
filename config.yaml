@@ -9,7 +9,14 @@ variables:
   greeting: Hello
   name: World
 
-template:
-  engine: mustache
-  path: ./template.mustache
+subject: Hello World
 
+recipients:
+
+plain:
+  engine: mustache
+  path: ./plain.mustache
+
+html:
+  engine: mustache
+  path: ./html.mustache

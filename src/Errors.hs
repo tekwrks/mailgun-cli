@@ -20,9 +20,9 @@ parseFailed e = do
   print e
   exitWith $ ExitFailure 2
 
-noTemplate :: IO a
-noTemplate = do
-  putStrLn "failed : no template found"
+noPlain :: IO a
+noPlain = do
+  putStrLn "failed : no plain text template found"
   exitWith $ ExitFailure 3
 
 noValueForVariables :: [String] -> IO String

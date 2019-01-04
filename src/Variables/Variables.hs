@@ -5,6 +5,7 @@ module Variables.Variables
   ) where
 
 import Data.List (nubBy, filter)
+import Data.Maybe (fromMaybe)
 import System.IO
 import System.Exit
 import qualified Data.Text as T
@@ -16,13 +17,13 @@ import Variables.Types (Variable, Variables)
 
 fromConfig :: Maybe Config -> Variables
 fromConfig Nothing = []
-fromConfig (Just c) = variables c
+fromConfig (Just c) = fromMaybe [] $ variables c
 
 fromStrings :: [String] -> Variables
 fromStrings [] = []
 fromStrings (a:as) =
   let (k,v) = T.breakOn "=" (T.pack a)
-   in (T.unpack k, T.unpack . T.tail $ v) : (fromStrings as)
+   in (T.unpack k, T.unpack . T.tail $ v) : fromStrings as
 
 get :: [String] -> Maybe Config -> IO Variables
 get args mconfig = do

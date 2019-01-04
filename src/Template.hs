@@ -2,6 +2,7 @@ module Template
   ( TemplateDesc(..)
   , get
   , Template
+  , emptyTemplate
   , variables
   , substitute
   , render
@@ -23,6 +24,9 @@ data TemplateDesc = TemplateDesc
   }
 
 type Template = [Node]
+
+emptyTemplate :: Template
+emptyTemplate = []
 
 get :: TemplateDesc -> IO Template
 get TemplateDesc{ engine=_, path=p } = do

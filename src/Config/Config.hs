@@ -1,6 +1,6 @@
 module Config.Config
   ( Config(..)
-  , get
+    , get
   ) where
 
 import System.IO
@@ -20,26 +20,30 @@ instance FromJSON Config where
   parseJSON (Object v) = Config
     <$> v .:? "domain"
     <*> v .:? "apiKey"
-    <*> (v .: "variables" >>= parseVariables)
-    <*> (v .: "template" >>= parseTemplate)
     <*> v .:? "flags"
-      where
-        parseVariables :: Maybe Object -> Parser Variables
-        parseVariables Nothing = return []
-        parseVariables (Just o) = return $ fmap parseVariable $ toList o
-          where
-            parseVariable v = (unpack . fst $ v, extract . snd $ v)
-            extract (String t) = unpack t
-            extract (Number s) = show s
-            extract Null = ""
-            extract _ = ""
-        parseTemplate :: Maybe Object -> Parser (Maybe TemplateDesc)
-        parseTemplate (Just t) = TemplateDesc
-          <$> t .:? "engine" .!= "mustache"
-          <*> t .: "path"
-          >>= (return . Just)
-        parseTemplate Nothing = return Nothing
+    <*> (v .: "variables" >>= parseVariables)
+    <*> v .:? "subject"
+    <*> v .:? "recipients"
+    <*> (v .: "plain" >>= parseTemplate)
+    <*> (v .: "html" >>= parseTemplate)
   parseJSON invalid = typeMismatch "Config" invalid
+
+parseVariables :: Maybe Object -> Parser (Maybe Variables)
+parseVariables Nothing = return Nothing
+parseVariables (Just o) = return . Just $ fmap parseVariable $ toList o
+  where
+    parseVariable v = (unpack . fst $ v, extract . snd $ v)
+    extract (String t) = unpack t
+    extract (Number s) = show s
+    extract Null = ""
+    extract _ = ""
+
+parseTemplate :: Maybe Object -> Parser (Maybe TemplateDesc)
+parseTemplate (Just t) = TemplateDesc
+  <$> t .:? "engine" .!= "mustache"
+  <*> t .: "path"
+  >>= (return . Just)
+parseTemplate Nothing = return Nothing
 
 get :: FilePath -> IO (Either ParseException Config)
 get = decodeFileEither

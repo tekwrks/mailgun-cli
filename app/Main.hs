@@ -8,18 +8,16 @@ import qualified Template (substitute, variables, render)
 main :: IO ()
 main = do
   env <- get
-  -- print env
-  let substituted = Template.substitute (template env) (variables env)
-  print substituted
-  rendered <- render substituted
-  print rendered
+  print env
+  -- let substituted = Template.substitute (template env) (variables env)
+  -- print substituted
+  -- rendered <- render substituted
+  -- print rendered
 
 render :: Template -> IO String
 render t = do
-  let unsubed = Template.variables t
-  if unsubed == []
-     then do
-       maybe Errors.couldNotRender return $ Template.render t
-     else
-       Errors.noValueForVariables unsubed
+  let emptys = Template.variables t
+  if null emptys
+     then maybe Errors.couldNotRender return $ Template.render t
+     else Errors.noValueForVariables emptys
 
