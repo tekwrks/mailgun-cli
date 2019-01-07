@@ -25,11 +25,7 @@ import qualified Config.Config as Config (get, Config(..))
 import qualified Context (create)
 import Template (TemplateDesc(..), Template)
 import qualified Template (get)
-
-data Message = Message
-  { plain :: Template
-  , html :: Maybe Template
-  } deriving (Show)
+import Message (Message(..))
 
 data Environment = Environment
   { flags :: Flags

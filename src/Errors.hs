@@ -27,7 +27,7 @@ noPlain = do
 
 noValueForVariables :: [String] -> IO String
 noValueForVariables vs = do
-  putStrLn "failed : no value for varaibles: "
+  putStrLn "failed : no value for variables: "
   mapM (hPrint stderr) vs
   exitWith $ ExitFailure 4
 
