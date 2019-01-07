@@ -3,7 +3,12 @@ module Errors where
 import System.Exit
 import System.IO
 
-ioError :: IOError -> IO String
+strError :: String -> IO a
+strError e = do
+  print e
+  exitWith $ ExitFailure 0
+
+ioError :: IOError -> IO a
 ioError e = do
   print e
   exitWith $ ExitFailure 0
