@@ -33,7 +33,7 @@ noPlain = do
 noValueForVariables :: [String] -> IO String
 noValueForVariables vs = do
   putStrLn "failed : no value for variables: "
-  mapM (hPrint stderr) vs
+  mapM_ (hPrint stderr) vs
   exitWith $ ExitFailure 4
 
 couldNotRender :: IO String
@@ -50,4 +50,9 @@ parseMustache :: (Show a) => a -> IO b
 parseMustache e = do
   print e
   exitWith $ ExitFailure 7
+
+noFrom :: IO a
+noFrom = do
+  print "failed : no sender email address"
+  exitWith $ ExitFailure 8
 

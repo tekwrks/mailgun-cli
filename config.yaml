@@ -5,13 +5,15 @@ flags:
   - --dry-run
   - foo=bar
 
+from: acme@acme.com
+subject: Hello World
+to:
+cc:
+bcc:
+
 variables:
   greeting: Hello
   name: World
-
-subject: Hello World
-
-recipients:
 
 plain:
   engine: mustache
