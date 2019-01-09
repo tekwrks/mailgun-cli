@@ -23,7 +23,10 @@ instance FromJSON Config where
     <*> v .:? "flags"
     <*> (v .: "variables" >>= parseVariables)
     <*> v .:? "subject"
-    <*> v .:? "recipients"
+    <*> v .:? "from"
+    <*> v .:? "to"
+    <*> v .:? "cc"
+    <*> v .:? "bcc"
     <*> (v .: "plain" >>= parseTemplate)
     <*> (v .: "html" >>= parseTemplate)
   parseJSON invalid = typeMismatch "Config" invalid

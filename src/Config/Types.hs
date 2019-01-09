@@ -9,7 +9,10 @@ data Config = Config
   , flags :: Maybe [String]
   , variables :: Maybe Variables
   , subject :: Maybe String
-  , recipients :: Maybe [String]
+  , from :: Maybe String
+  , to :: Maybe [String]
+  , cc :: Maybe [String]
+  , bcc :: Maybe [String]
   , plain :: Maybe TemplateDesc
   , html :: Maybe TemplateDesc
   }

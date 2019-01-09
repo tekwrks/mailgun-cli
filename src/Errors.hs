@@ -56,3 +56,13 @@ noFrom = do
   print "failed : no sender email address"
   exitWith $ ExitFailure 8
 
+noTo :: IO a
+noTo = do
+  print "failed : no recipient email address"
+  exitWith $ ExitFailure 9
+
+noSubject :: IO a
+noSubject = do
+  print "failed : no email subject"
+  exitWith $ ExitFailure 10
+
