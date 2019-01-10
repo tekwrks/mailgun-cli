@@ -26,12 +26,15 @@ import qualified Context (create)
 import Template (TemplateDesc(..), Template)
 import qualified Template (get)
 import Message (Message(..))
+import Header (Header(..))
+import qualified Header (get)
 
 data Environment = Environment
   { flags :: Flags
   , variables :: Variables
   , context :: HailgunContext
   , message :: Message
+  , header :: Header
   } deriving (Show)
 
 get :: IO Environment
@@ -43,10 +46,11 @@ get = do
   plain <- maybe Errors.noPlain Template.get $ getPlain flags mconfig
   let htmlDesc = getHtml flags mconfig
   html <- case htmlDesc of
-            Nothing -> return Nothing
-            (Just d) -> Just <$> Template.get d
+              Nothing -> return Nothing
+              (Just d) -> Just <$> Template.get d
   let message = Message plain html
-  return $ Environment flags variables context message
+  head <- Header.get flags mconfig
+  return $ Environment flags variables context message head
 
 getPlain :: Flags -> Maybe Config.Config -> Maybe TemplateDesc
 getPlain fs Nothing = plainFromFlags fs
