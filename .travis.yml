@@ -1,5 +1,7 @@
 sudo: false
 
+language: generic
+
 # Caching so the next build will be fast too.
 cache:
   directories:
@@ -14,3 +16,6 @@ before_install:
 script:
   - stack --no-terminal --skip-ghc-check test
 
+notifications:
+  slack:
+    secure: JiKtXlwuxw31Di0vPH0r62lFE+629TF3GZ1s4fLKVGMf3mK2X4AUHrtj/vJw5V17jf4CXHsWGuHk8B5+8KRgRK1M8/7vgRBVx+TQtQRFMajTUx/5grgZimjZGyzWL7+QOVARqUDzAd3dthtEm3j1+kBGkARGKeUTUuXKEgOlIk0AKINIf9Riq13j6IBJiaGDZOuqrAbOQ0RU1LE2o/tdTG9Ddr98d/rd3B7xR8L1tB6NpOUjtIz7tZ0AevAQ1JlGuoFVGD2TqG3baGQjK/kJCSmhRU81MeZSGvlLhkq26ct5RXCDKB5NjNStGMVKdmexmgjcK4HA7co2TxvHvm+DbYM/tAMiwCICozzNNfmtVDYb9RbY1r2mBAhPq5DpQB5LRMOrShwvvTp9LlQ/tlnfbuk7bMRAOplR6qz7uDVgWy5LtQ8ah67sHmTVlMxgmhPqLIuqN1U2xpSKLEOhCz4oldda9xDUrKH1S8/dOJu0KKTEAhJ8afpxbbPQ3PtzZ5k93W0SOekR33lwwNXM7wfxUFoMeJqUYNDugu26PNV6IZ1x43rdxP8PSC3Mmq0pO44Zq0tVs8NqSqY6FssHbqh4psRVbOhYNWH5dGw1U/jXZP3kxzQx3WxQ9KdytrIYBZEx2BxKue1yo/eXk6MfYvtcId6tIaAjZ4Jl1u76M9fFLqg=
