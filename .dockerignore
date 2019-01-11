@@ -1,0 +1,9 @@
+.git/
+
+.stack-work/
+mailgun-cli.cabal
+
+.hspec-failures
+
+templates/
+config.yaml
