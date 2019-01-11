@@ -1,5 +1,5 @@
 name:                mailgun-cli
-version:             0.0.0.0
+version:             1.0.0
 github:              "tekwrks/mailgun-cli"
 license:             BSD3
 author:              "tekwrks"
