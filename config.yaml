@@ -2,7 +2,7 @@ domain: DOMAIN
 apiKey: API-KEY
 
 flags:
-  - --dry-run
+  - --subject="Hey World"
   - foo=bar
 
 from: acme@acme.com
@@ -11,14 +11,14 @@ to:
 cc:
 bcc:
 
+plain:
+  engine: mustache
+  path: templates/plain.mustache
+
+html:
+  path: templates/html.mustache
+
 variables:
   greeting: Hello
   name: World
 
-plain:
-  engine: mustache
-  path: ./plain.mustache
-
-html:
-  engine: mustache
-  path: ./html.mustache
